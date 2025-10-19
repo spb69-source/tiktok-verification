@@ -13,10 +13,10 @@ export function TikTokLogo({ className }: TikTokLogoProps) {
         className="inline-block"
       >
         <img 
-          src="/logo.jpg" 
+          src="/logo.png" 
           alt="TikTok Logo" 
-          width="120" 
-          height="120" 
+          width="80" 
+          height="80" 
           data-testid="img-tiktok-logo"
           className="drop-shadow-lg"
         />
